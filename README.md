@@ -1,96 +1,96 @@
-# Universal Behavioral Modeling Data Challenge
+# 通用行为建模数据挑战赛
 
-## Introduction
+## 介绍
 
-### Why a Universal Behavioral Modeling Challenge?
+### 为什么需要一个通用行为建模挑战?
 
-The challenge is designed to promote a unified approach to behavior modeling. Many modern enterprises rely on machine learning and predictive analytics for improved business decisions. Common predictive tasks in such organizations include recommendation, propensity prediction, churn prediction, user lifetime value prediction, and many others. A central piece of information used for these predictive tasks are logs of past behavior of users e.g., what they bought, what they added to their shopping cart, which pages they visited. Rather than treating these tasks as separate problems, we propose a unified modeling approach.
+该挑战旨在推广一种统一的行为建模方法。许多现代企业依赖机器学习和预测分析来改进商业决策。这些组织中常见的预测任务包括推荐、倾向预测、流失预测、用户生命周期价值预测等。用于这些预测任务的核心信息是用户过去行为的日志，例如他们购买了哪些商品、将哪些商品加入购物车、访问了哪些页面等。我们建议将这些任务视为一个整体，而不是单独的问题，提出一种统一的建模方法。
 
-To achieve this, we introduce the concept of Universal Behavioral Profiles — user representations that encode essential aspects of each individual’s past interactions. These profiles are designed to be universally applicable across multiple predictive tasks, such as churn prediction and product recommendations. By developing representations that capture fundamental patterns in user behavior, we enable models to generalize effectively across different applications.
+为此，我们引入了通用行为档案的概念——即编码每个个体过去交互关键方面的用户表示。这些档案设计为可跨多个预测任务普遍适用，例如流失预测和产品推荐。通过开发能够捕捉用户行为基本模式的表示，我们使模型能够在不同应用中有效地泛化。
 
-### Challenge Overview
+### 挑战概述
 
-The objective of this challenge is to develop Universal Behavioral Profiles based on the provided data, which includes various types of events such as purchases, add to cart, remove from cart, page visit, and search query. These user representations will be evaluated based on their ability to generalize across a range of predictive tasks. The task of the challenge participants is to submit user representations, which will serve as inputs to a simple neural network architecture. Based on the submitted representations, models will be trained on several tasks, including some that are disclosed to participants, called "open tasks," as well as additional hidden tasks, which will be revealed after the competition ends. The final performance score will be an aggregate of results from all tasks. We iterate model training and evaluation automatically upon submission. The only task for participants is to submit universal user representations.
+本次挑战的目标是基于提供的数据开发通用行为档案，这些数据包括各种类型的事件，如购买、加入购物车、从购物车移除、页面访问和搜索查询。这些用户表示将根据其在各种预测任务中的泛化能力进行评估。挑战参与者的任务是提交用户表示，这些表示将作为简单神经网络架构的输入。基于提交的表示，模型将在多个任务上进行训练，包括一些向参与者公开的任务（称为"公开任务"），以及一些将在比赛结束后揭晓的隐藏任务。最终的性能得分将是所有任务结果的综合。我们会在提交后自动迭代模型训练和评估。参与者的唯一任务是提交通用的用户表示。
 
-- Participants are asked to provide user representations — Universal Behavioral Profiles
-- Downstream task training is conducted by the organizers, however, the competition pipeline is publicly available and is presented in this repository
-- Model for each downstream task is trained separately, but using the same embeddings (user representations)
-- Performance will be evaluated based on all downstream tasks
+- 参与者需要提供用户表示——即通用行为档案
+- 下游任务的训练由组织者进行，但竞赛流程是公开的，并在本仓库中展示
+- 每个下游任务的模型是单独训练的，但使用相同的嵌入（用户表示）
+- 性能将基于所有下游任务进行评估
 
-### Open Tasks
-- **Churn Prediction:** Binary classification into 1: user will churn or 0: user will not churn. Churn task is performed on a subset of active users with at least one `product_buy` event in history (data available for the participants)
-Task name: `churn`
-- **Categories Propensity:** Multi-label classification into one of 100 possible labels. The labels represent the 100 most often purchase product categories.
-Task name: `propensity_category`
-- **Product Propensity:** Multi-label classification into one of 100 possible labels. The labels represent the 100 most often purchase products in train target data.
-Task name: `propensity_sku`
+### 公开任务
+- **流失预测:** 二元分类，1表示用户将流失，0表示用户不会流失。流失任务在具有至少一次`product_buy`事件的历史活跃用户子集上执行（数据可供参与者使用）
+任务名称: `churn`
+- **类别倾向:** 多标签分类，分为100个可能的标签之一。这些标签代表最常购买的100个产品类别。
+任务名称: `propensity_category`
+- **产品倾向:** 多标签分类，分为100个可能的标签之一。这些标签代表训练目标数据中最常购买的100个产品。
+任务名称: `propensity_sku`
 
-### Hidden Tasks
-In addition to the open tasks, the challenge includes hidden tasks, which remain undisclosed during the competition. The purpose of these tasks is to ensure that submitted Universal Behavioral Profiles are capable of generalization rather than being fine-tuned for specific known objectives. Similar to the open tasks, the hidden tasks focus on predicting user behavior based on the submitted representations, but they introduce new contexts that participants are not explicitly optimizing for.
+### 隐藏任务
+除了公开任务外，本次挑战还包括隐藏任务，这些任务在比赛期间保持保密。这些任务的目的是确保提交的通用行为档案能够泛化，而不是针对特定已知目标进行微调。与公开任务类似，隐藏任务基于提交的表示来预测用户行为，但它们引入了参与者没有明确优化的新场景。
 
-After the competition concludes, the hidden tasks will be disclosed along with the corresponding code, allowing participants to replicate results.
+比赛结束后，隐藏任务将与相应的代码一起公布，允许参与者复现结果。
 
-## Dataset
+## 数据集
 
-We release an anonymized dataset containing real-world user interaction logs.
-Additionally, we provide product properties that can be joined with `product_buy`, `add_to_cart`, and `remove_from_cart` event types.
-Each source has been stored in a separate file.
+我们发布了一个包含真实用户交互日志的匿名数据集。
+此外，我们提供了可以与`product_buy`、`add_to_cart`和`remove_from_cart`事件类型连接的产品属性。
+每个数据源都存储在一个单独的文件中。
 
-**Note**  
-All recorded interactions can be utilized to create Universal Behavioral Profiles; however, participants are required to submit behavioral profiles for only a subset of 1,000,000 users, which will be used for model training and evaluation.
+**注意**
+所有记录的交互都可以用于创建通用行为档案；然而，参与者只需要为1,000,000个用户的子集提交行为档案，这些档案将用于模型训练和评估。
 
 
 |          |    product_buy    |    add_to_cart    |    remove_from_cart    |      page_visit  |      search_query  |
 |:---------|:-----------------:|:-----------------:|:----------------------:|:----------------:|:------------------:|
 |   Events |     1,682,296     |     5,235,882     |     1,697,891          |     150,713,186  |     9,571,258      |
 
-### Dataset Description
+### 数据集描述
 
-#### Columns
+#### 列
 
 **product_properties**:
-- **sku (int64):** Numeric ID of the item.
-- **category (int64):** Numeric ID of the item category.
-- **price (int64):** Numeric ID of the bucket of item price (see section [Column Encoding](https://github.com/Synerise/recsys2025#column-encoding)).
-- **name (object):** Vector of numeric IDs representing a quantized embedding of the item name (see section [Column Encoding](https://github.com/Synerise/recsys2025#column-encoding)).
+- **sku (int64):** 商品的数字ID。
+- **category (int64):** 商品类别的数字ID。
+- **price (int64):** 商品价格区间的数字ID（参见[列编码](https://github.com/Synerise/recsys2025#column-encoding)部分）。
+- **name (object):** 表示商品名称量化嵌入的数字ID向量（参见[列编码](https://github.com/Synerise/recsys2025#column-encoding)部分）。
 
 **product_buy**:
-- **client_id (int64):** Numeric ID of the client (user).
-- **timestamp (object):** Date of event in the format YYYY-MM-DD HH:mm:ss.
-- **sku (int64):** Numeric ID of the item.
+- **client_id (int64):** 客户（用户）的数字ID。
+- **timestamp (object):** 事件日期，格式为YYYY-MM-DD HH:mm:ss。
+- **sku (int64):** 商品的数字ID。
 
 **add_to_cart**:
-- **client_id (int64):** Numeric ID of the client (user).
-- **timestamp (object):** Date of event in the format YYYY-MM-DD HH:mm:ss.
-- **sku (int64):** Numeric ID of the item.
+- **client_id (int64):** 客户（用户）的数字ID。
+- **timestamp (object):** 事件日期，格式为YYYY-MM-DD HH:mm:ss。
+- **sku (int64):** 商品的数字ID。
 
 **remove_from_cart**:
-- **client_id (int64):** Numeric ID of the client (user).
-- **timestamp (object):** Date of event in the format YYYY-MM-DD HH:mm:ss.
-- **sku (int64):** Numeric ID of the item.
+- **client_id (int64):** 客户（用户）的数字ID。
+- **timestamp (object):** 事件日期，格式为YYYY-MM-DD HH:mm:ss。
+- **sku (int64):** 商品的数字ID。
 
 **page_visit**:
-- **client_id (int64):** Numeric ID of the client.
-- **timestamp (object):** Date of event in the format YYYY-MM-DD HH:mm:ss.
-- **url (int64):** Numeric ID of visited URL. The explicit information about what (e.g., which item) is presented on a particular page is not provided.
+- **client_id (int64):** 客户的数字ID。
+- **timestamp (object):** 事件日期，格式为YYYY-MM-DD HH:mm:ss。
+- **url (int64):** 访问URL的数字ID。关于特定页面上展示的内容（例如哪个商品）的明确信息未提供。
 
 **search_query**:
-- **client_id (int64):** Numeric ID of the client.
-- **timestamp (object):** Date of event in the format YYYY-MM-DD HH:mm:ss.
-- **query (object):** Vector of numeric IDs representing a quantized embedding of the search query term (see section [Column Encoding](https://github.com/Synerise/recsys2025#column-encoding)).
+- **client_id (int64):** 客户的数字ID。
+- **timestamp (object):** 事件日期，格式为YYYY-MM-DD HH:mm:ss。
+- **query (object):** 表示搜索查询词量化嵌入的数字ID向量（参见[列编码](https://github.com/Synerise/recsys2025#column-encoding)部分）。
 
-#### Column Encoding
+#### 列编码
 
-**Text Columns ('name', 'query')**:  
-In order to anonymize the data, we first embed the texts with an appropriate large language model (LLM). Then, we quantize the embedding with a high-quality embedding quantization method. The final quantized embedding has the length of 16 numbers (buckets) and in each bucket, there are 256 possible values: {0, …, 255}.
+**文本列 ('name', 'query')**:
+为了匿名化数据，我们首先使用适当的大语言模型（LLM）对文本进行嵌入。然后，我们使用高质量的嵌入量化方法对嵌入进行量化。最终的量化嵌入长度为16个数字（桶），每个桶有256个可能的值：{0, …, 255}。
 
-**Decimal Columns ('price')**:  
-These were originally floating-point numbers, which were split into 100 quantile-based buckets.
+**数字列 ('price')**:
+这些列最初是浮点数，被分割为100个基于分位数的桶。
 
-## Data Format
+## 数据格式
 
-This section describes the format of the competition data.
-We provide a data directory containing event files and two subdirectories: `input` and `target`.
+本节描述竞赛数据的格式。
+我们提供了一个包含事件文件和两个子目录的数据目录：`input`和`target`。
 
 **Note**  
 For the purpose of running training and baseline code from this repository, it is important to keep the data directory structure intact.

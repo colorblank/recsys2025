@@ -1,58 +1,59 @@
-# Baseline Solution for the Universal Behavioral Modeling Data Challenge
+# 数据挑战的通用行为建模基线解决方案
 
-Here, we present a baseline solution for the data challenge. For more information about the challenge and the dataset, see the README in the root directory.  
-In order to run training with generated representations, the data needs to be split into input and target chunks, and embeddings should be generated based on the input event files.  
+在此，我们为数据挑战提供一个基线解决方案。有关挑战和数据集的更多信息，请参阅根目录中的README。  
+为了使用生成的表征进行训练，需要将数据拆分为输入和目标块，并基于输入事件文件生成嵌入。
 
-**IMPORTANT! To split the data, use the `data_utils.split_data` script. Instructions on how to run the script are provided in the README in the root directory, under the [Data Splitting](https://github.com/Synerise/recsys2025#data-splitting) section.**
+**重要！请使用 `data_utils.split_data` 脚本进行数据拆分。运行该脚本的说明请参阅根目录README中[数据拆分](https://github.com/Synerise/recsys2025#data-splitting)部分。**
 
-## Baseline embedding approach: feature aggregation
+## 基线嵌入方法：特征聚合
 
-This baseline follows feature engineering practices present in real-life solutions in the behavioral modeling domain. It constructs simple aggregated features of two types: statistical and query features.
+该基线遵循现实行为建模领域中常见的特征工程实践，构建了两种类型的简单聚合特征：统计特征和查询特征。
 
-### Statistical features
+### 统计特征
 
-Statistical features represent categories, prices, and products users were interested in. They correspond to past interaction counts for each user, for example, *how many times the user bought a certain product X during the last 30 days*.
+统计特征表示用户感兴趣的商品类别、价格和产品。这些特征对应用户过去交互的计数，例如：*用户在过去30天内购买特定商品X的次数*。
 
-For each user, we consider a set of time windows, e.g., 1 day, 1 week, and 1 month and aggregate the number of events grouped by column values.  
-**For example:**  
-Last month the user added the following products to their cart: 3 of category X, 2 of category Y; 4 products were in the 3rd price bucket, and 1 in the 4th price bucket.  
-Last month the user bought 1 product of category X in the 3rd price bucket.  
-The same statistics are computed for other time windows and event types.
+对于每个用户，我们考虑一组时间窗口（例如1天、1周、1个月），并按列值聚合事件数量。  
+**例如：**  
+上个月用户将以下商品加入购物车：3件属于类别X，2件属于类别Y；4件属于第3价格区间，1件属于第4价格区间。  
+上个月用户购买了1件属于类别X且位于第3价格区间的商品。  
+相同统计方法将应用于其他时间窗口和事件类型。
 
-**Note**  
-Given the significant number of categories, we may only use a subset of the values to compute features as the full set of values for all event types and time windows will result in very large vectors. For feature computation, we limit categories, price buckets, or products to 10 most popular values. 
+**注意**  
+鉴于类别数量庞大，我们可能仅使用部分值来计算特征，因为所有事件类型和时间窗口的完整值集会产生非常大的向量。在特征计算中，我们将类别、价格区间或产品限制为前10个最流行的值。
 
-### Query features
+### 查询特征
 
-Since `search_query` event type contains integer vectors obtained by quantizing text embeddings of users' search queries, we apply a different method to extract valuable information for this event type. For each user, we construct new features by taking the average of integer vectors corresponding to user's queries.
+由于`search_query`事件类型包含用户搜索查询文本嵌入的整数量化向量，我们采用不同方法提取该事件类型的有价值信息。对于每个用户，我们通过取用户查询对应整数向量的平均值来构建新特征。
 
-### Baseline pipeline overview
+### 基线流程概览
 
-User features are extracted from the recorded raw event data. First, features are calculated separately for each type of event. Then they are merged, leading to information-rich user representations (Universal Behavioral Profiles). In the end, in the `embedding_dir` defined by a user the `np.ndarray` with `client_ids` and the corresponding `np.ndarray` with `embeddings` are saved in `.npy` files, which corresponds to the submission format of the competition.
+用户特征从原始事件数据中提取。首先为每种事件类型单独计算特征，然后合并这些特征以生成信息丰富的用户表征（通用行为档案）。最终，在用户定义的`embedding_dir`中，以`.npy`文件格式保存包含`client_ids`的`np.ndarray`和对应的嵌入`np.ndarray`，符合竞赛提交格式要求。
 
-## Create competition entry embeddings
+## 创建竞赛提交嵌入
 
-`create_embeddings.py` creates an exemplar competition submission, based on selected event types. The script generates features for each event type and merges them to create user representations, which serve as input embeddings for model training and validation. The script uses a default set of columns for statistical features:  
- - `category` and `price` for the event types: `product_buy`, `add_to_cart`, `remove_from_cart` 
- - `url` for `page_visit`
- - `query` for `search_query`
+`create_embeddings.py`脚本基于选定事件类型生成示例竞赛提交。该脚本为每种事件类型生成特征并合并以创建用户表征，作为模型训练和验证的输入嵌入。脚本默认使用以下列进行统计特征计算：
+ - `category`和`price`用于事件类型：`product_buy`、`add_to_cart`、`remove_from_cart`
+ - `url`用于`page_visit`
+ - `query`用于`search_query`
 
-### Arguments
+### 参数
 
-- `--data-dir`: Directory with train and target data – produced by `data_utils.split_data`
-- `--embeddings-dir`: Directory to save the generated embeddings in the competition-compliant format
-- `--num-days`:  A list of time windows (in days) for generating features. Each time window will produce a different set of features aggregating events from the defined period
+- `--data-dir`：包含训练和目标数据的目录——由`data_utils.split_data`生成
+- `--embeddings-dir`：保存符合竞赛格式的生成嵌入的目录
+- `--num-days`：生成特征的时间窗口（天数）列表。每个时间窗口将生成不同特征集，聚合该时间段内的事件数据
 
-  **For example:**
-  Providing the following list [1, 7, 30] in the `--num-days` parameter will result in three different features created for a single column value, e.g., the number of products of a given category bought in the last 1, 7, and 30 days.
-- `--top-n`: Number of top column values to consider in feature generation
+  **例如：**  
+  在`--num-days`参数中提供列表[1,7,30]，将为每个列值生成三个不同特征，例如：过去1、7、30天内购买的某类别商品数量。
+  
+- `--top-n`：特征生成时考虑的列值前N位数量
 
-### Output
+### 输出
 
-Client ids and corresponding embeddings are saved in `--embeddings-dir` in two files: `client_ids.npy` and `embeddings.npy`.
+用户ID和对应的嵌入向量将保存在`--embeddings-dir`目录下的两个文件中：`client_ids.npy`和`embeddings.npy`。
 
-### Running the script
+### 运行脚本
 
 ```bash
-python -m baseline.aggregated_features_baseline.create_embeddings --data-dir <splitted-challenge-data-dir> --embeddings-dir <your-embeddings-dir>
+python -m baseline.aggregated_features_baseline.create_embeddings --data-dir <拆分后的挑战数据目录> --embeddings-dir <你的嵌入目录>
 ```
