@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 import pytorch_lightning as pl
+import torch
 
 from pathlib import Path
 from typing import List
@@ -89,6 +90,16 @@ def run_training(
         loss_fn=task_settings.loss_fn,
         metrics_tracker=task_settings.metrics_tracker,
     )
+
+    # Configure device strategy based on platform
+    if accelerator == 'gpu' and torch.backends.mps.is_available():
+        # Use MPS (Metal Performance Shaders) for Mac M1
+        accelerator = 'mps'
+        devices = 1
+    elif accelerator == 'gpu':
+        # Fallback to CPU if GPU is requested but MPS is not available
+        accelerator = 'cpu'
+        devices = None
 
     trainer = pl.Trainer(
         accelerator=accelerator,
