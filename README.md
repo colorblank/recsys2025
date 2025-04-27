@@ -92,202 +92,238 @@
 本节描述竞赛数据的格式。
 我们提供了一个包含事件文件和两个子目录的数据目录：`input`和`target`。
 
-**Note**  
-For the purpose of running training and baseline code from this repository, it is important to keep the data directory structure intact.
+好的，这是您提供的英文文档的中文翻译：
 
-### 1. Event and properties files
-The event data, which should be used to generate user representations, is divided into five Parquet files. Each file corresponds to a different type of user interaction available in the dataset (see section [Dataset Description](https://github.com/Synerise/recsys2025#dataset-description)):
+-----
 
-- **product_buy.parquet**
-- **add_to_cart.parquet**
-- **remove_from_cart.parquet**
-- **page_visit.parquet**
-- **search_query.parquet**
+**注意**
 
-Product properties are stored in:
+为了运行此存储库中的训练和基线代码，保持数据目录结构完整非常重要。
 
-- **product_properties.parquet**
+### 1\. 事件和属性文件
 
-### 2. `input` directory
-This directory stores a NumPy file containing a subset of 1,000,000 `client_id`s for which Universal Behavioral Profiles should be generated:
+用于生成用户表示的事件数据被分为五个 Parquet 文件。每个文件对应于数据集中不同类型的用户交互（见[数据集描述](https://github.com/Synerise/recsys2025#dataset-description)部分）：
 
-- **relevant_clients.npy**
+  - **product\_buy.parquet**
+  - **add\_to\_cart.parquet**
+  - **remove\_from\_cart.parquet**
+  - **page\_visit.parquet**
+  - **search\_query.parquet**
 
-Using the event files, participants are required to create Universal Behavioral Profiles for the clients listed in `relevant_clients.npy`. These clients are identified by the `client_id` column in the event data.
+商品属性存储在：
 
-The generated profiles must follow the format outlined in the **Competition Entry Format** section and will serve as input for training models across all specified tasks, including churn prediction, product propensity, category propensity, and additional hidden tasks. The code for the downstream tasks is fixed and provided to participants (see [Model Training](https://github.com/Synerise/recsys2025#model-training) section).
+  - **product\_properties.parquet**
 
-### 3. `target` directory
-This directory stores the labels for propensity tasks. For each propensity task, target category names are stored in NumPy files:
+### 2\. `input` 目录
 
-- **propensity_category.npy**: Contains a subset of 100 categories for which the model is asked to provide predictions
-- **popularity_propensity_category.npy**: Contains popularity scores for categories from the `propensity_category.npy` file. Scores are used to compute the Novelty measure. For details, see the [Evaluation](https://github.com/Synerise/recsys2025#evaluation) section
-- **propensity_sku.npy**: Contains a subset of 100 products for which the model is asked to provide predictions
-- **popularity_propensity_sku.npy**: Contains popularity scores for products from the `propensity_sku.npy` file. These scores are used to compute the Novelty measure. For details, see the [Evaluation](https://github.com/Synerise/recsys2025#evaluation) section
-- **active_clients.npy**: Contains a subset of relevant clients with at least one `product_buy` event in history (data available for the participants). Active clients are used to compute churn target. For details, see the [Open Tasks](https://github.com/Synerise/recsys2025#open-tasks) section
+此目录存储一个 NumPy 文件，其中包含 1,000,000 个需要生成通用行为特征的 `client_id` 子集：
 
-These files are specifically used to create the ground truth labels for the propensity tasks. The target (ground truth) for each task is automatically computed by the `TargetCalculator` class in `universal_behavioral_modeling_challenge.training_pipeline.target_calculators`.
+  - **relevant\_clients.npy**
 
-**Note**  
-To run internal experiments with this repository, the event data should be split into `input` and `target` chunks, which are stored in the `input` and `target` directories, respectively. This setup imitates the official evaluation pipeline; however, the official train and validation target data are not provided to competitors. To create the data split, see the [Data Splitting](https://github.com/Synerise/recsys2025#data-splitting) section.
+参与者需要使用事件文件为 `relevant_clients.npy` 中列出的客户创建通用行为特征。这些客户通过事件数据中的 `client_id` 列进行标识。
 
-## Competition Entry Format
+生成的特征必须遵循**竞赛提交格式**部分中概述的格式，并将作为跨所有指定任务（包括流失预测、商品偏好、类别偏好和额外的隐藏任务）训练模型的输入。下游任务的代码是固定的，并提供给参与者（见[模型训练](https://github.com/Synerise/recsys2025#model-training)部分）。
 
-**Participants are asked to prepare Universal Behavioral Profiles — user representations that will serve as input to the first layer of a neural network with a fixed, simple architecture.** For each submission, the models will be trained and evaluated by the organizers, and the evaluation outcome will be displayed on the leaderboard. However, we make the training pipeline and model architecture available for participants to use in internal testing.
+### 3\. `target` 目录
 
-Each competition entry consists of two files: `client_ids.npy` and `embeddings.npy`
+此目录存储偏好任务的标签。对于每个偏好任务，目标类别名称存储在 NumPy 文件中：
+
+  - **propensity\_category.npy**: 包含模型需要提供预测的 100 个类别的子集
+  - **popularity\_propensity\_category.npy**: 包含 `propensity_category.npy` 文件中类别的流行度得分。这些得分用于计算新颖性指标。有关详细信息，请参阅[评估](https://github.com/Synerise/recsys2025#evaluation)部分
+  - **propensity\_sku.npy**: 包含模型需要提供预测的 100 个商品的子集
+  - **popularity\_propensity\_sku.npy**: 包含 `propensity_sku.npy` 文件中商品的流行度得分。这些得分用于计算新颖性指标。有关详细信息，请参阅[评估](https://github.com/Synerise/recsys2025#evaluation)部分
+  - **active\_clients.npy**: 包含至少有一个 `product_buy` 历史事件的相关客户子集（参与者可以获得的数据）。活跃客户用于计算流失目标。有关详细信息，请参阅[公开任务](https://github.com/Synerise/recsys2025#open-tasks)部分
+
+这些文件专门用于创建偏好任务的真实标签。每个任务的目标（真实值）由 `universal_behavioral_modeling_challenge.training_pipeline.target_calculators` 中的 `TargetCalculator` 类自动计算。
+
+**注意**
+
+为了在此存储库中运行内部实验，事件数据应拆分为 `input` 和 `target` 两个部分，分别存储在 `input` 和 `target` 目录中。此设置模仿了官方评估流程；但是，官方的训练和验证目标数据不会提供给参赛者。要创建数据拆分，请参阅[数据拆分](https://github.com/Synerise/recsys2025#data-splitting)部分。
+
+## 竞赛提交格式
+
+**参与者需要准备通用行为特征——用户表示，它将作为具有固定、简单架构的神经网络第一层的输入。** 对于每次提交，模型将由组织者进行训练和评估，评估结果将显示在排行榜上。但是，我们提供了训练流程和模型架构供参与者在内部测试中使用。
+
+每个竞赛提交包含两个文件：`client_ids.npy` 和 `embeddings.npy`
 
 #### `client_ids.npy`
-   - A file that stores the IDs of clients for whom Universal Behavioral Profiles were created
-   - `client_ids` must be stored in a one-dimensional NumPy ndarray with `dtype=int64`
-   - The file should contain client IDs from the `relevant_clients.npy` file, and the order of IDs must match the order of embeddings in the embeddings file
+
+  - 存储已创建通用行为特征的客户 ID 的文件
+  - `client_ids` 必须存储在一维 NumPy ndarray 中，数据类型为 `dtype=int64`
+  - 该文件应包含来自 `relevant_clients.npy` 文件的客户 ID，并且 ID 的顺序必须与 embeddings 文件中 embeddings 的顺序相匹配
 
 #### `embeddings.npy`
-   - A file that stores Universal Behavioral Profiles as a **dense user embeddings matrix**
-   - Each embedding corresponds to the client ID from `client_ids.npy` with the same index
-   - Dense embeddings must be stored in a two-dimensional NumPy ndarray, where:
-     - The first dimension corresponds to the number of users and matches the dimension of the `client_ids` array
-     - The second dimension represents the embedding size
-     - The `dtype` of the embeddings array must be `float16`
-   - The embedding size cannot exceed `max_embedding_dim = 2048`
 
-**It is crucial that the order of IDs in the `client_ids` file matches the order of embeddings in the embeddings file to ensure proper alignment and data integrity.**
+  - 存储通用行为特征作为**稠密用户嵌入矩阵**的文件
+  - 每个 embedding 对应于 `client_ids.npy` 中具有相同索引的客户 ID
+  - 稠密 embeddings 必须存储在二维 NumPy ndarray 中，其中：
+      - 第一维对应于用户数量，并与 `client_ids` 数组的维度相匹配
+      - 第二维表示 embedding 的大小
+      - embeddings 数组的数据类型 `dtype` 必须为 `float16`
+  - embedding 的大小不能超过 `max_embedding_dim = 2048`
 
-### **IMPORTANT! The maximum length of the embedding vectors is 2048.**
+**至关重要的是，`client_ids` 文件中 ID 的顺序必须与 embeddings 文件中 embeddings 的顺序相匹配，以确保正确的对齐和数据完整性。**
 
-## Competition Entry Validator
+### **重要提示！嵌入向量的最大长度为 2048。**
 
-Competitors must ensure that their submitted files adhere to this structure for successful participation in the competition. The entry format can be validated using the provided validation script:
+## 竞赛提交验证器
+
+参赛者必须确保其提交的文件符合此结构，才能成功参与竞赛。可以使用提供的验证脚本验证条目格式：
 
 `universal_behavioral_modeling_challenge/validator/run.py`
 
-### **Arguments**
-   - `--data-dir`: The directory containing the data provided by the organizer, including `relevant_clients.npy` file in `input` subdirectory (described in **Data Format** section)
-   - `--embeddings-dir`: The directory where the `client_ids` and `embeddings` files are stored
+### **参数**
 
-### **Running the Validator**
+  - `--data-dir`: 包含组织者提供的数据的目录，包括 `input` 子目录中的 `relevant_clients.npy` 文件（在**数据格式**部分中描述）
+  - `--embeddings-dir`: 存储 `client_ids` 和 `embeddings` 文件的目录
+
+### **运行验证器**
 
 ```bash
 python -m validator.run --data-dir <data_dir> --embeddings-dir <your_embeddings_dir>
 ```
 
-## Model training
-Model training is conducted by challenge organizers. Multiple indepedent models with identical architecutre are trained for downstream tasks (churn, propensity, and hidden tasks) and the combined score is presented on the leaderboard. The training process is fixed for every task and all competition entries. Our objective is to evaluate the expressive power of created Universal Behaviorl Profiles, not the model architecture itself.
+## 模型训练
 
-### Model architecture
-- the model architecture consists of three Inverted Bottleneck blocks, adapted from *Scaling MLPs: A Tale of Inductive Bias* (https://arxiv.org/pdf/2306.13575.pdf), with layer normalization and residual connections; see `UniversalModel` class in `universal_behavioral_modeling_challenge.training_pipeline.model`
-- the input to the first layer of the network are embeddings provided in the competition entry
-- the output is task-specific and computed by the `TargetCalculator` class in `universal_behavioral_modeling_challenge.training_pipeline.target_calculators`
-- model hyperparameters are fixed and the same for each task and each competition entry:
-   - BATCH_SIZE = 128
-   - HIDDEN_SIZE_THIN = 2048
-   - HIDDEN_SIZE_WIDE = 4096
-   - LEARNING_RATE = 0.001
-   - MAX_EMBEDDING_DIM = 2048
-   - MAX_EPOCH = 3
+模型训练由竞赛组织者进行。多个具有相同架构的独立模型针对下游任务（流失、偏好和隐藏任务）进行训练，并在排行榜上显示组合得分。对于每个任务和所有竞赛提交，训练过程都是固定的。我们的目标是评估所创建的通用行为特征的表达能力，而不是模型架构本身。
 
-**Note**  
-For model evaluation, we consider the best score out of 3 epochs.
+### 模型架构
 
-## Evaluation
+  - 模型架构由三个倒置瓶颈块组成，改编自 *Scaling MLPs: A Tale of Inductive Bias* ([https://arxiv.org/pdf/2306.13575.pdf](https://arxiv.org/pdf/2306.13575.pdf))，带有层归一化和残差连接；参见 `universal_model_challenge.training_pipeline.model` 中的 `UniversalModel` 类
+  - 网络第一层的输入是竞赛提交中提供的 embeddings
+  - 输出是特定于任务的，由 `universal_behavioral_modeling_challenge.training_pipeline.target_calculators` 中的 `TargetCalculator` 类计算
+  - 模型超参数是固定的，并且对于每个任务和每个竞赛提交都是相同的：
+      - BATCH\_SIZE = 128
+      - HIDDEN\_SIZE\_THIN = 2048
+      - HIDDEN\_SIZE\_WIDE = 4096
+      - LEARNING\_RATE = 0.001
+      - MAX\_EMBEDDING\_DIM = 2048
+      - MAX\_EPOCH = 3
 
-The primary metric used to measure model performance is AUROC. We use `torchmetrics` implementation of AUROC. Additionally, the performance of Category Propensity and Product Propensity models is evaluated based on the novelty and diversity of the predictions. In these cases, the task score is calculated as a weighted sum of all metrics:
+**注意**
+
+对于模型评估，我们考虑 3 个 epoch 中的最佳得分。
+
+## 评估
+
+用于衡量模型性能的主要指标是 AUROC。我们使用 `torchmetrics` 库实现的 AUROC。此外，类别偏好和商品偏好模型的性能还基于预测的新颖性和多样性进行评估。在这种情况下，任务得分计算为所有指标的加权和：
+
 ```
-0.8 × AUROC + 0.1 × Novelty + 0.1 × Diversity
+0.8 × AUROC + 0.1 × 新颖性 + 0.1 × 多样性
 ```
-### Diversity
 
-To compute the diversity of single prediction, we first apply element-wise sigmoid to the predictions, and l1 normalize the result. The diversity of the prediction is the entropy of this distribution.
+### 多样性
 
-The final diversity score is computed as the average diversity of the model's predictions.
+要计算单个预测的多样性，我们首先对预测应用元素级的 sigmoid 函数，然后对结果进行 l1 归一化。预测的多样性是此分布的熵。
 
-### Novelty
+最终的多样性得分计算为模型预测的平均多样性。
 
-The popularity of a single prediction is the weighted sum of the popularities of the top `k` recommended targets in the prediction. This is normalized so that a popularity score of `1` corresponds to the following scenario:
-> The model's top `k` predictions are the `k` most popular items, and the model is absolutely certain about predicting all of these items.
+### 新颖性
 
-The popularity score is then computed as the average popularity of the model's predictions. Finally, we compute the novelty of the predictions as `1 - popularity`.
- 
-Due to the sparsity of the data, the popularity scores, as computed so far are close to 0, and thus the corresponding raw novelty scores are really close to 1. To make the measure more sensitive to small changes near 1, we raise the raw popularity score to the 100th power.
+单个预测的流行度是预测中前 `k` 个推荐目标的流行度的加权和。这经过归一化处理，使得流行度得分为 `1` 对应于以下情况：
 
-### Final leaderboard score
+> 模型的前 `k` 个预测是 `k` 个最受欢迎的商品，并且模型对预测所有这些商品都非常有把握。
 
-For each task, a leaderboard is created based on the respective task scores. The final score, which evaluates the overall quality of user representations and their ability to generalize, is determined by aggregating ranks from all per-task leaderboards using the Borda count method. In this approach, each model's rank in a task leaderboard is converted into points, where a model ranked `k`-th among `N` participants receives `N - k` points. The final ranking is based on the total points accumulated across all tasks, ensuring that models performing well consistently across multiple tasks achieve a higher overall score.
+然后将流行度得分计算为模型预测的平均流行度。最后，我们将预测的新颖性计算为 `1 - 流行度`。
 
-## Competition submission
+由于数据的稀疏性，到目前为止计算出的流行度得分接近于 0，因此相应的原始新颖性得分非常接近于 1。为了使该指标对接近 1 的微小变化更敏感，我们将原始流行度得分提高到 100 次方。
 
-1. Organizers provide the input set of event data as described in the [Data Format](https://github.com/Synerise/recsys2025#data-format) section
-2. Competitors are asked to create user embeddings (Universal Behavioral Profiles) based on the provided data
-3. Created embeddings are submitted following the **Competition Entry Format**
-4. Organizers are using submitted embeddings to train models in multiple **Downstream Tasks**
-5. Models are validated on the left-out subset of data
-6. Validation results are presented on the leaderboards
+### 最终排行榜得分
 
+对于每个任务，都会根据各自的任务得分创建一个排行榜。最终得分用于评估用户表示的整体质量及其泛化能力，通过使用 Borda 计数法聚合来自所有按任务划分的排行榜的排名来确定。在这种方法中，模型在任务排行榜中的排名 `k` 会转换为分数，其中在 `N` 个参与者中排名第 `k` 的模型获得 `N - k` 分。最终排名基于跨所有任务累积的总分，确保在多个任务中表现始终良好的模型获得更高的总分。
 
-## Competition code
-We provide a framework that participants can use to test their solutions. The same code is used in the competition to train models for downstream tasks. Only targets for hidden tasks are not included in the provided code.
+## 竞赛提交
 
-### Requirements
-Requirements are provided in the `requirements.txt` file.
+1.  组织者提供如[数据格式](https://github.com/Synerise/recsys2025#data-format)部分所述的输入事件数据集。
+2.  参赛者需要根据提供的数据创建用户嵌入（通用行为特征）。
+3.  创建的嵌入按照**竞赛提交格式**提交。
+4.  组织者使用提交的嵌入在多个**下游任务**中训练模型。
+5.  模型在预留的数据子集上进行验证。
+6.  验证结果将显示在排行榜上。
 
-### Data Splitting
-Running the competition code for internal tests requires splitting raw event data into three distinct time windows: input events, events to compute train target, and events to compute validation target.
-The first set of events is training input data that are used to create users' representations. These representations serve as an input to train downstream models. For baseline solutions with user representation methods see `baseline` module in this repository.
-The training target is not included in data tables explicitly, but is computed on the fly based on events in the training target time window. It consists of 14 days after the last timestamp in the input data. The model is trained to predict events in the target based on input user representations.
+## 竞赛代码
 
-**Target example:**
-To create a propensity target, we check if the user made any purchase in a given category within the provided target time window. Propensity target categories are provided in separate files: `propensity_category.npy` and `propensity_sku.npy`. In the case of a churn target, we check if the user made any purchase in the provided target data sample.
+我们提供了一个框架，参与者可以使用该框架测试他们的解决方案。竞赛中也使用相同的代码来训练下游任务的模型。只有隐藏任务的目标不包含在提供的代码中。
 
-The next 14 days after the training target set are used to compute the validation target and measure model performance.
+### 要求
 
-**IMPORTANT! This data-splitting procedure is meant for internal testing. In the official competition settings, users' representations — which are the competition entry — should be created based on ALL provided events. The official training and validation targets are hidden from the competitors.**
+要求在 `requirements.txt` 文件中提供。
 
-### Split data script
-We provide a script to split data according to the described procedure:
+### 数据拆分
+
+运行竞赛代码进行内部测试需要将原始事件数据拆分为三个不同的时间窗口：输入事件、计算训练目标事件和计算验证目标事件。
+
+第一组事件是训练输入数据，用于创建用户表示。这些表示作为训练下游模型的输入。有关使用用户表示方法的基线解决方案，请参阅此存储库中的 `baseline` 模块。
+
+训练目标没有在数据表中显式包含，而是根据训练目标时间窗口中的事件动态计算的。它包括输入数据中最后一个时间戳之后的 14 天。模型经过训练以基于输入用户表示预测目标中的事件。
+
+**目标示例：**
+
+要创建偏好目标，我们会检查用户是否在给定的目标时间窗口内在给定的类别中进行了任何购买。偏好目标类别在单独的文件中提供：`propensity_category.npy` 和 `propensity_sku.npy`。对于流失目标，我们会检查用户是否在提供的目标数据样本中进行了任何购买。
+
+训练目标集之后的接下来的 14 天用于计算验证目标并衡量模型性能。
+
+**重要提示！此数据拆分过程仅用于内部测试。在官方竞赛设置中，用户的表示（即竞赛提交）应基于所有提供的事件创建。官方的训练和验证目标对参赛者是隐藏的。**
+
+### 拆分数据脚本
+
+我们提供了一个脚本来按照描述的过程拆分数据：
+
 `data_utils/split_data.py`
 
-**Arguments**
+**参数**
 
-- `--challenge-data-dir`: Competition data directory which should consist of event files, product properties file and two subdirectories — input (with `relevant_clients.npy`) and target (with `propensity_category.npy` and `propensity_sku.npy`).
+  - `--challenge-data-dir`: 竞赛数据目录，应包含事件文件、商品属性文件和两个子目录——input（包含 `relevant_clients.npy`）和 target（包含 `propensity_category.npy` 和 `propensity_sku.npy`）。
 
-**Output**
-Input events are saved as Parquet files in the input subdirectory in `--challenge-data-dir`. Train and validation target events are saved as Parquet files in the target subdirectory in `--challenge-data-dir`
+**输出**
 
-**Running**
-Run the script:
+输入事件将作为 Parquet 文件保存在 `--challenge-data-dir` 的 input 子目录中。训练和验证目标事件将作为 Parquet 文件保存在 `--challenge-data-dir` 的 target 子目录中。
+
+**运行**
+
+运行脚本：
+
 ```bash
 python -m data_utils.split_data --challenge-data-dir <your_challenge_data_dir>
 ```
 
-### Model training script
-**Arguments**
-- `--data-dir`: Directory where competition target and input data are stored.
-- `--embeddings-dir`: Directory where Universal Behavioral Profiles, which are used as model input embeddings are stored. Embeddings should be stored in the format described in the **Competition Entry Format** section.
-- `--tasks`: List of tasks to evaluate the model on, possible values are: `churn`, `propensity_category`, `propensity_sku`.
-- `--log-name`: Name for the experiment, used for logging.
-- `--num-workers`: Number of subprocesses for data loading.
-- `--accelerator`: Type of accelerator to use. Argument is directly passed to `pl.LightningModule`. Possible values include: `gpu`, `cpu`. For more options, [see here](https://lightning.ai/docs/pytorch/stable/common/trainer.html#accelerator) .
-- `--devices`: List of devices to use for training. Note that using `auto` when `accelerator="gpu"` sometimes produces undesired behavior, and may result in slower training time.
-- `--neptune-api-token` (optional): API token for Neptune logger. If not specified, the results are logged offline.
-- `--neptune-project` (optional): Name of Neptune project in the format `<workspace>/<project>` to log the results of the experiment to. If not specified, the results are logged offline.
-- `--disable-relevant-clients-check` (optional): This flag disables the validation check that ensures the `client_ids.npy` file from the submission matches the contents of `relevant_clients.npy`. It allows training to be run on a different set of clients than the relevant clients.  
+### 模型训练脚本
 
-**Note**
-For the official submission, the relevant clients validation check will be enabled, and embeddings must be provided **for all and only the relevant clients**. However, the --disable-relevant-clients-check flag should be used for internal experiments, as not all relevant clients remain in the input data after using the `data_utils.split_data` script.
+**参数**
 
-**Running scripts**
+  - `--data-dir`: 存储竞赛目标和输入数据的目录。
+  - `--embeddings-dir`: 存储用作模型输入嵌入的通用行为特征的目录。嵌入应以**竞赛提交格式**部分描述的格式存储。
+  - `--tasks`: 要评估模型的任务列表，可能的值包括：`churn`、`propensity_category`、`propensity_sku`。
+  - `--log-name`: 实验的名称，用于日志记录。
+  - `--num-workers`: 数据加载的子进程数。
+  - `--accelerator`: 要使用的加速器类型。该参数直接传递给 `pl.LightningModule`。可能的值包括：`gpu`、`cpu`。更多选项请[参见此处](https://lightning.ai/docs/pytorch/stable/common/trainer.html#accelerator)。
+  - `--devices`: 用于训练的设备列表。请注意，当 `accelerator="gpu"` 时使用 `auto` 有时会产生不希望的行为，并可能导致训练时间变慢。
+  - `--neptune-api-token` (可选): Neptune 日志记录器的 API 令牌。如果未指定，结果将离线记录。
+  - `--neptune-project` (可选): Neptune 项目的名称，格式为 `<workspace>/<project>`，用于将实验结果记录到该项目。如果未指定，结果将离线记录。
+  - `--disable-relevant-clients-check` (可选): 此标志禁用验证检查，该检查确保提交的 `client_ids.npy` 文件与 `relevant_clients.npy` 的内容匹配。它允许在与相关客户不同的客户集上运行训练。
 
-Offline logging:
+**注意**
+
+对于正式提交，将启用相关客户验证检查，并且必须**仅为所有相关客户**提供嵌入。但是，对于内部实验，应使用 `--disable-relevant-clients-check` 标志，因为在使用 `data_utils.split_data` 脚本后，并非所有相关客户都保留在输入数据中。
+
+**运行脚本**
+
+离线日志记录：
+
 ```bash
 python -m training_pipeline.train --data-dir <your_splitted_challenge_data_dir> --embeddings-dir <your-embeddings-dir> --tasks churn propensity_category propensity_sku --log-name <my_experiment> --accelerator gpu --devices 0 --disable-relevant-clients-check
 ```
-Logging into a Neptune workspace:
+
+记录到 Neptune 工作区：
+
 ```bash
 python -m training_pipeline.train --data-dir <your_splitted_challenge_data_dir> --embeddings-dir <your-embeddings-dir> --tasks churn propensity_category propensity_sku --log-name <my_experiment> --accelerator gpu --devices 0 --neptune-api-token <your-api-token> --neptune-project <your-worskspace>/<your-project> --disable-relevant-clients-check
 ```
 
-## Baselines
-In the `baseline` directory, we provide scripts with an example competition entry and an additional README_AGGREGATED_FEATURES.md file with more detailed instructions.  
+## 基线
 
----
-*In case of any problems, you can contact the organizers by email via the address [recsyschallenge\@synerise.com](mailto:recsyschallenge\@synerise.com).*
+在 `baseline` 目录中，我们提供了包含示例竞赛提交的脚本和一个额外的 README\_AGGREGATED\_FEATURES.md 文件，其中包含更详细的说明。
+
+-----
+
+*如有任何问题，您可以通过电子邮件联系组织者：[email address removed]。*
