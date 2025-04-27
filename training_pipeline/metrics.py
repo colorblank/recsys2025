@@ -76,7 +76,7 @@ class Novelty(PLMetric):
         """
         max_popularity = np.sum(np.sort(popularity_data)[-self.k :])
         self.add_state(
-            "popularity_data", default=torch.tensor(popularity_data / max_popularity)
+            "popularity_data", default=torch.tensor(popularity_data / max_popularity, dtype=torch.float32)
         )
 
         self.add_state(
